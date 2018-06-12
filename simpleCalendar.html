@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>js简单日历</title>
+<style>
+*{
+	padding:0;
+	margin:0;
+	}
+.wrapper{
+	width:560px;
+	margin:0 auto;
+	}	
+.header{
+	background:#09C;
+	text-align:center;
+	color:#fff;
+	height:60px;
+	}
+.header span{
+	float:left;
+	line-height:60px;
+	cursor:pointer;
+	width:60px;
+	}
+.header h2{
+	float:left;
+	line-height:60px;
+	width:440px;
+	}
+li{	
+	list-style:none;
+	width:80px;
+	height:80px;
+	float:left;
+	text-align:center;
+	line-height:80px;
+	background:#ccc;
+	color:#fff;
+	}
+li.gray{
+	color:#ddd;
+	}
+.date{	
+	}
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+	<div class="header">
+        <span><</span>
+        <h2></h2>
+        <span>></span>
+    </div>
+    <div class="date">
+    	<ul>
+            <li>日</li>
+            <li>一</li>
+            <li>二</li>
+            <li>三</li>
+            <li>四</li>
+            <li>五</li>
+            <li>六</li>
+        </ul>
+        <ul></ul>
+    </div>
+	
+</div>
+<script>
+/*
+ * 思路
+ * 得到日期对应月份的天数（是否闰年、特殊月份2、1、3、5、7、8、10、12）
+ * 得到日期对应月份第一天是星期几，计算前置几个日期项，日期项的内容需要获取上一个月的天数，来递减添加
+ * 得到总日期项和现在日期项的差值，计算后置几个日期项
+ */
+var timeText = document.getElementsByTagName('h2')[0];
+var dateList = document.getElementsByTagName('ul')[1];
+var spans = document.getElementsByTagName('span');
+
+
+var date = new Date();
+var year = date.getFullYear();
+var month = date.getMonth() + 1;
+
+showDate(year,month);
+
+function showDate(year,month){
+	var str = '';
+	timeText.innerHTML = year + '年' +  month + '月';
+	// 得到日期对应月份的天数
+	function getDaysNum(year,month){	
+		if((year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0)) && month === 2){		
+			return 29;	
+		}
+		if(month === 2){
+			return 28;	
+		}else if(month === 1 || month === 3 || month === 5 || month === 7 || month === 8 || month === 10 || month === 12){
+			return 31;	
+		}else{
+			return 30;
+			}
+	}
+	
+	// 得到日期对应月份第一天是星期几
+	function getDay(year,month){
+		var date = new Date(year,month-1,1);
+		return date.getDay();	
+		
+	}
+	var daysNum = getDaysNum(year,month);
+	var dayWeek = getDay(year,month); 
+	
+	for(var i = 0; i < daysNum; i++){
+		str += '<li>' + (i + 1) + '</li>';	
+	}
+	if(dayWeek > 0){
+		var preDaysNum = getDaysNum(year,month -1);
+		for(var i = 0; i < dayWeek; i++){
+			str = '<li class="gray">'+ (preDaysNum - i) +'</li>' + str;	
+		}
+	}
+	
+	dateList.innerHTML = str;
+	
+	var lis = dateList.getElementsByTagName('li');
+	var nextlen = 42 - lis.length;
+	
+	if(nextlen > 0){
+		for(var i = 0; i < nextlen; i++){
+			str += 	'<li  class="gray">' + (i + 1) + '</li>';
+		}
+	}
+	dateList.innerHTML = str;
+	
+}
+
+
+
+spans[0].onclick = function(){
+	preTime();	
+}
+spans[1].onclick = function(){
+	nextTime();	
+}
+function preTime(){
+	
+	if(month === 1){
+		year--;
+		month = 12;	
+	}else{
+		month--;	
+	}	
+	showDate(year,month);	
+}
+
+function nextTime(){	
+	if(month === 12){
+		year++;
+		month = 1;	
+	}else{
+		month++;	
+	}	
+	showDate(year,month);	
+}
+</script>
+</body>
+</html>
+
